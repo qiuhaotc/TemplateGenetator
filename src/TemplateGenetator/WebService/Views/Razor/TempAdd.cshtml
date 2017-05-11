@@ -1,0 +1,117 @@
+﻿@model WebService.Data.TempInfo
+@{
+    ViewBag.Title = "添加模板";
+}
+
+<div class="panel panel-default ">
+    <div class="panel-heading"><div class="panel-title">新增模板</div></div>
+    <div class="panel-body">
+        <form action="/Razor/TempAdd" method="post" id="contentVue" v-cloak>
+            <div class="form-group">
+                <label for="TempName">模板名称</label>
+                <input type="text" class="form-control" name="TempName" v-model="TempName" />
+                <label for="TempType">模板类型</label>
+                <select v-model="TempType" id="TempType" class="form-control">
+                    @{
+                        var itemList = TemplateGenerator.Util.EnumHelper.GetEnumList<WebService.Data.TemplateType>();
+
+                        foreach (var item in itemList)
+                        {
+                    <option value="@item.Key">@item.Name</option>
+                        }
+                    }
+                </select>
+                <label for="OrderID">模板排序值</label>
+                <input type="text" class="form-control" name="OrderID" v-model="OrderID | intOnly" />
+
+                <label for="FolderName">批量生成时文件夹名称</label>
+                <input type="text" class="form-control" name="FolderName" v-model="FolderName" />
+
+                <label for="namespaceStr">命名空间</label>
+                <input type="text" class="form-control" name="namespaceStr" v-model="namespaceStr" />
+
+                <label for="fileName">文件名</label>
+                <input type="text" class="form-control" name="fileName" v-model="fileName" placeholder="留空就使用表名作为文件名,格式'{0}'"/>
+
+                <label for="extention">后缀名</label>
+                <input type="text" class="form-control" name="extention" v-model="extention" />
+
+                <label for="TempDesc">模板简介</label>
+                <textarea class="form-control" id="TempDesc" name="TempDesc" v-model="TempDesc" style="height:100px;"></textarea>
+
+                <label for="Content">模板数据</label>
+                <textarea class="form-control" id="Content" name="Content" v-model="Content" style="height:800px;"></textarea>
+            </div>
+            <input class="btn btn-primary" type="button" value="保存" v-on:click="sendData" />
+            <input class="btn btn-warning" type="button" value="返回" v-on:click="cancelData" />
+        </form>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/scripts/vue.js"></script>
+    <script>
+
+        Vue.filter('intOnly', {
+            // view -> model
+            // 在写回数据之前格式化值
+            write: function (val, oldVal) {
+
+                console.log(val+" "+oldVal );
+
+                var number = val.replace(/[^\d]/g, '')
+                return isNaN(number) ? 0 : parseInt(number)
+            }
+        })
+
+        // 直接创建一个实例
+        var vm = new Vue({
+            el: '#contentVue',
+            data: {
+                Content: "",
+                TempID:@Model.TP_ID,
+                OrderID:@Model.TP_Order,
+                TempDesc:"",
+                FolderName:'@Model.TP_FolderName.Replace("'","")',
+                TempName:'',
+                namespaceStr:'',
+                TempType:@Model.TP_Type,
+                extention:'cs',
+                fileName:'@Model.TP_FileName'
+            },
+            methods:
+                {
+                    sendData: function () {
+
+                        if (this.TempName == "" || this.Content == "" || this.OrderID <= 0||isNaN(this.OrderID) || this.FolderName == "") {
+                            alert("模板名称,数据,批量生成时文件夹名称不能为空或排序值不能小于0!");
+                            return;
+                        }
+
+                        if (this.isPending) {
+                            alert("上一个请求还未结束");
+                            return;
+                        }
+
+                        this.isPending = true;
+
+                        $.post("/razor/TempAdd", {TempType:this.TempType,OrderID:this.OrderID,TempDesc:this.TempDesc,FolderName:this.FolderName, Content: this.Content, TempName: this.TempName,namespaceStr:this.namespaceStr,extention:this.extention,fileName:this.fileName }, function (data) {
+                            if (data.Status == 1) {
+                                alert(data.Desc);
+                                vm.cancelData();
+                            }
+                            else {
+                                alert(data.Desc);
+                            }
+
+                            vm.isPending = false;
+
+                        }, 'json');
+                    },
+                    cancelData: function () {
+                        location.href = " @Url.Action("templatemgr", "razor")";
+                    }
+                }
+        });
+    </script>
+}
+

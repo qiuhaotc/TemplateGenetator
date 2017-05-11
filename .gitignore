@@ -1,0 +1,5 @@
+*.suo
+src/TemplateGenetator/packages/
+src/TemplateGenetator/TemplateGenetator/obj/
+src/TemplateGenetator/WebService/bin/
+src/TemplateGenetator/WebService/obj/

@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewBag.Title = "批量代码生成";
+}
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-pills nav-stacked" role="tablist">
+            <li role="presentation"><a href="/razor/index">模板代码生成器</a></li>
+            <li role="presentation" class="active"><a href="/razor/BatchGenerator">批量模板代码生成器</a></li>
+            <li role="presentation"><a href="/razor/DatabaseConfig">数据库配置</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <form role="form" id="contentVue" method="post">
+            <div class="panel panel-default ">
+                <div class="panel-heading"><div class="panel-title">批量模板代码生成器</div></div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-info" v-on:click="getData">获取参数</button>
+                        <img v-if="isPending" src="~/Image/pending.gif" v-cloak/>
+                        <img v-if="!isPending" src="~/Image/yes.png" v-cloak/>
+                    </div>
+                    <label for="tempName">模板名称</label>
+                    <div class="form-group">
+                        <template v-for="item in templates">
+                            <label for="Temp_{{item.Key}}" class="checkbox-inline">
+                                <input type="checkbox" id="Temp_{{item.Key}}" name="tempIDs" value="{{item.Key}}" v-model="templatesSelected" />{{item.Name}}
+                            </label>
+                        </template>
+                    </div>
+                    <label for="tableName">数据库表名</label>
+                    <div class="form-group">
+                        <template v-for="item in tableNames">
+                            <label for="Table_{{item.Key}}" class="checkbox-inline">
+                                <input type="checkbox" id="Table_{{item.Key}}" name="tablenames" value="{{item.Key}}" v-model="tableNamesSelected" />{{item.Name}}
+                            </label>
+                        </template>
+                    </div>
+                    <div class="form-group">
+                        <label for="isUpdate">模板是否已更新</label>
+                        <div class="checkbox">
+                            <label for="isUpdate">
+                                <input type="checkbox" id="isUpdate" v-model="isUpdate" name="forceChange" value="true" />已更新
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" v-on:click="sendData" >生成数据</button>
+                        <img v-if="isGenerating" src="~/Image/pending.gif" v-cloak/>
+                    </div>
+                    <div v-if="isError" transition="expand" class="alert alert-danger" role="alert" v-cloak>
+                        {{result}}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/scripts/vue.js"></script>
+    <script>
+        // 直接创建一个实例
+        var vm = new Vue({
+            el: '#contentVue',
+            data: {
+                tempName: "123",
+                isUpdate: false,
+                result: "",
+                templates: [],
+                tableNames: [],
+                tableNamesSelected: [],
+                templatesSelected: [],
+                isPending: false,
+                isError:false
+                //nameSpace: "Model",
+                //extention: "cs"
+            },
+            methods: {
+                getData: function () {
+
+                    if (this.isPending) {
+
+                        vm.result = "上一个请求还未结束!";
+                        vm.isError = true;
+
+                        setTimeout(function () { vm.isError = false; }, 1000);
+
+                        return;
+                    }
+
+                    this.isPending = true;
+
+                    $.post("/razor/GetData", function (data) {
+                        if (data.Status == 1) {
+                            console.log(data.Data)
+                            console.log(data.DataTable)
+                            vm.templates = data.Data;
+                            vm.tableNames = data.DataTable;
+                            vm.isError = false;
+                        }
+                        else {
+                            vm.templates = [];
+                            vm.tableNames = [];
+                            console.log(data.Desc)
+                            vm.result = "发送错误." + data.Desc;
+                            vm.isError = true;
+                        }
+
+                        vm.isPending = false;
+                    }, 'json');
+                },
+                sendData: function () {
+
+                    if (this.templatesSelected.length == 0 || this.tableNamesSelected.length == 0) {
+                        vm.isError = true;
+                        vm.result = "模板名称或数据库表名不能为空!";
+                        return;
+                    }
+                    else {
+                        vm.isError = false;
+                        vm.result = "";
+                    }
+
+                    $("#contentVue").attr("action", "/razor/GeneratorDataBatch");
+
+                    $(contentVue).submit();
+
+                    this.isUpdate = false;
+                }
+            }
+        });
+
+        $(function () {
+            vm.getData();
+
+        })
+    </script>
+}
+

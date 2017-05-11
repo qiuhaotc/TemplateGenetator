@@ -1,0 +1,18 @@
+@using TemplateGenerator.RazorGenerator
+package @ViewBag.NameSpaceStr;
+@{
+    string className = RazorHelper.UpperFirstLetter(ViewBag.ClassName.ToString());
+    string primaryKey = RazorHelper.GetPrimaryKeyTypeJava(ViewBag.Data as List<TemplateGenerator.GeneratorModel.TableInfoModel>);
+}
+import com.example.dao.I@(className+"Dao");
+import com.example.pojo.@className;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Created by QH on @DateTime.Now.ToString("yyyy/MM/dd")
+ */
+@@Repository
+public class @(className + "DaoImpl") extends BaseDao<@className,@primaryKey>
+    implements I@(className+"Dao") {
+
+}

@@ -1,0 +1,24 @@
+﻿@model TemplateGenerator.GeneratorModel.CodeFirstModel
+@{
+    ViewBag.Title = "TestCodeFirst";
+}
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-pills nav-stacked" role="tablist">
+            <li class="nav-header">List header</li>
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Library</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <h2>@Model.Title</h2>
+
+        <h2>@Model.ClassName</h2>
+
+        @foreach (var item in Model.CodeFirstItemList)
+        {
+            <div>@item.ItemName @item.DisplayType @item.IsKey @item.ItemDisplayName @item.Order</div>
+        }
+
+    </div>
+</div>

@@ -1,0 +1,10 @@
+﻿@model List<WebService.Data.TempInfo>
+@{
+    ViewBag.Title = "TestSQLlite";
+}
+
+<h2>TestSQLlite</h2>
+@foreach (var item in Model)
+{
+    <div>@item.TP_ID &nbsp;  @item.TP_Name</div>
+}

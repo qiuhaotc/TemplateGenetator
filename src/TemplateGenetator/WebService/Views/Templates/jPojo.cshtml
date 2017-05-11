@@ -1,0 +1,43 @@
+@using TemplateGenerator.RazorGenerator
+package @ViewBag.NameSpaceStr;
+@{
+    string className = RazorHelper.UpperFirstLetter(ViewBag.ClassName.ToString());
+    string primaryKey = RazorHelper.GetPrimaryKeyTypeJava(ViewBag.Data as List<TemplateGenerator.GeneratorModel.TableInfoModel>);
+}
+
+import javax.persistence.*;
+import java.sql.Date;
+import java.util.Set;
+
+/**
+ * Created by PC on @DateTime.Now.ToString("yyyy/MM/dd")
+ */
+@@Entity
+@@Table(name="@ViewBag.ClassName")
+public class @className {
+
+@foreach (TemplateGenerator.GeneratorModel.TableInfoModel item in ViewBag.Data)
+{
+    string typeName = RazorHelper.GetItemTypeJava(item, true);
+    if (item.IsPrimaryKey == 1)
+    {
+    <text>@@Id</text>
+    }
+    if (item.IsIdentity==1)
+    {
+    <text>@@GeneratedValue(strategy = GenerationType.IDENTITY)</text>
+    }
+    <text>@@Column(name= "@item.ColName")</text>
+    <text>private @typeName @item.ColName;</text>
+    <text>public @typeName get@(RazorHelper.UpperFirstLetter(item.ColName))()
+    {
+    return this.@item.ColName;
+    }
+    </text>
+    <text>public void set@(RazorHelper.UpperFirstLetter(item.ColName))(@typeName @item.ColName)
+    {
+    this.@item.ColName=@item.ColName;
+    }
+    </text>
+}
+}

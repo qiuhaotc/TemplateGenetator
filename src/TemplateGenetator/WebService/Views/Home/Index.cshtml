@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<script src="~/scripts/vue2.0.js"></script>
+<h2>Index</h2>
+
+@{
+
+}
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-pills nav-stacked" role="tablist">
+            <li class="nav-header">List header</li>
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Library</a></li>
+        </ul>
+    </div>
+    <div id="vueContent" class="col-md-10">
+
+        <select v-model="dataSelect" number v-bind:id="dataSelect" :src="dataSelect+'_123123'">
+            <option v-for="item in listData" v-bind:value="item.key">{{item.name}}</option>
+        </select>
+        {{dataSelect}}
+    </div>
+    <script>
+        var vue = new Vue({
+            el: "#vueContent",
+            data: {
+                listData: [{ key: 2, name: "haha" }, { key: 3, name: "ffff" }, { key: 4, name: "xcdd" }],
+                dataSelect: 3
+            }
+        });
+    </script>
+
+</div>

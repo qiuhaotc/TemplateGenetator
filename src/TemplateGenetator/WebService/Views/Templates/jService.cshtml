@@ -1,0 +1,16 @@
+@using TemplateGenerator.RazorGenerator
+package @ViewBag.NameSpaceStr;
+@{
+    string className = RazorHelper.UpperFirstLetter(ViewBag.ClassName.ToString());
+    string primaryKey = RazorHelper.GetPrimaryKeyTypeJava(ViewBag.Data as List<TemplateGenerator.GeneratorModel.TableInfoModel>);
+}
+
+import com.example.dao.I@(className+"Dao");
+import com.example.pojo.@className;
+
+/**
+ * Created by QH on @DateTime.Now.ToString("yyyy/MM/dd")
+ */
+public interface I@(className+"Service") extends IBaseService<@(className),@primaryKey,I@(className+"Dao")> {
+
+}

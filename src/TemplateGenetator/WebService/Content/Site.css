@@ -1,0 +1,49 @@
+﻿*{
+    font-family:'Microsoft YaHei'
+}
+.h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
+    font-family:'Microsoft YaHei';
+}
+.container h1,.container  h2{
+    font-family:'Microsoft YaHei';
+}
+
+.jumbotron {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    margin-bottom:10px;
+    background:none;
+}
+
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    /*max-width: 280px;*/
+}
+
+[v-cloak] { display: none } 
+/* 必需 */
+.expand-transition {
+ transition: all .3s ease;
+}
+/* .expand-enter 定义进入的开始状态 */
+/* .expand-leave 定义离开的结束状态 */
+.expand-enter, .expand-leave {
+ height: 0;
+ padding: 0;
+ opacity: 0;
+ margin:0;
+}
+

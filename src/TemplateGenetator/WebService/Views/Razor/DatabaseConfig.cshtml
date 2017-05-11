@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewBag.Title = "数据库配置";
+}
+<div class="row">
+    <div class="col-md-2">
+        @*<div class="list-group">
+                <a class="list-group-item" href="/razor/index">模板代码生成器</a>
+                <a class="list-group-item" href="/razor/BatchGenerator">批量模板代码生成器</a>
+                <a class="list-group-item active" href="/razor/DatabaseConfig">数据库配置</a>
+            </div>*@
+        <ul class="nav nav-pills nav-stacked" role="tablist">
+            <li role="presentation"><a href="/razor/index">模板代码生成器</a></li>
+            <li role="presentation"><a href="/razor/BatchGenerator">批量模板代码生成器</a></li>
+            <li role="presentation" class="active"><a href="/razor/DatabaseConfig">数据库配置</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <div class="panel panel-default ">
+            <div class="panel-heading"><div class="panel-title">数据库配置</div></div>
+            <div class="panel-body">
+                <form action="/Razor/DatabaseConfig" method="post" id="contentVue" v-cloak>
+                    <div class="form-group">
+                        <label for="dbType">数据库类型</label>
+                        <select v-model="dbType" id="dbType" class="form-control">
+                            <option value="SQLServer">SQLServer</option>
+                            <option value="MySQL">MySQL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dbName">数据库名称</label>
+                        <input type="text" id="dbName" name="dbName" v-model="dbName" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="sqlStr">数据库连接字符串</label>
+                        <input type="text" id="sqlStr" name="sqlStr" v-model="sqlStr" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-primary" type="button" value="保存" v-on:click="sendData" />
+                    </div>
+
+                    <div v-if="isError" transition="expand" class="alert alert-danger" role="alert" v-cloak>
+                        {{result}}
+                    </div>
+                    <div v-if="isSuccess" transition="expand" class="alert alert-success" role="alert" v-cloak>
+                        {{result}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/scripts/vue.js"></script>
+    <script>
+        // 直接创建一个实例
+        var vm = new Vue({
+            el: '#contentVue',
+            data: {
+                sqlStr: "@ViewBag.SQLStr.Replace("\\","\\\\")",
+                dbType: "@ViewBag.DbType",
+                dbName:"@ViewBag.DBName",
+                isPending: false,
+                isError: false,
+                isSuccess: false,
+                result: "",
+            },
+            methods:
+                {
+                    sendData: function () {
+
+                        if (this.sqlStr == "" || this.isPending) {
+
+                            if (this.sqlStr == "") {
+                                vm.result = "数据库连接字符串不能为空!";
+                            }
+                            else {
+                                vm.result = "上一个请求还未结束!";
+                            }
+                            vm.isError = true;
+                            vm.isSuccess = false;
+
+                            return;
+                        }
+
+                        this.isPending = true;
+
+                        $.post("/razor/DatabaseConfig", { sqlStr: this.sqlStr, dbType: this.dbType, dbName: this.dbName }, function (data) {
+                            if (data.Status == 1) {
+                                vm.result = data.Desc;
+                                vm.isSuccess = true;
+                                vm.isError = false;
+                                setTimeout(function(){vm.isSuccess = false;}, 1000);
+                            }
+                            else {
+                                vm.result = data.Desc;
+                                vm.isSuccess = false;
+                                vm.isError = true;
+                            }
+
+                            vm.isPending = false;
+
+                        }, 'json');
+                    }
+                }
+        });
+    </script>
+}
+

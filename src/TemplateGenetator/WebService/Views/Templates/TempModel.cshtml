@@ -1,0 +1,36 @@
+@using TemplateGenerator.RazorGenerator
+using System;
+namespace @ViewBag.NameSpaceStr
+{
+    /// <summary>
+    /// @ViewBag.ClassName
+    ///</summary>
+    public class @ViewBag.ClassName
+    {
+        @foreach (TemplateGenerator.GeneratorModel.TableInfoModel item in ViewBag.Data)
+        {
+            string typeName = RazorHelper.GetItemType(item,true);
+            <text>private @typeName _@item.ColName.ToLower();</text>
+            <text>@Raw("///<summary>")</text>
+            <text>@Raw("///"+item.ColDesc)</text>
+            <text>@Raw("///</summary>")</text>
+            <text>public @typeName @item.ColName 
+            {
+                get
+                {
+                    return _@item.ColName.ToLower();
+                }
+                set
+                {
+                    _@item.ColName.ToLower() = value;
+                }
+            }
+            </text>
+        }
+    }
+}
+
+
+
+
+        

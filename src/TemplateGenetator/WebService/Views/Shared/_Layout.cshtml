@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Desc = "基于Razor引擎,通过数据库表信息或定义的模型生成代码.";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - 模板代码生成器</title>
+    <link rel="shortcut icon" href="/image/faviconNew.ico" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+</head>
+<body>
+    <div class="navbar @*navbar-inverse*@ navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navCollapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="~/">
+                    <img alt="Brand" src="~/Image/brand.png" style="height:20px;width:20px;">
+                </a>
+                @Html.ActionLink("模板代码生成器", "Index", "Razor", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse" id="navCollapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-toggle="dropdown">
+                            从数据库生成
+                            <span class="caret dropdown-toggle"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="/Razor/index">模板代码生成器</a></li>
+                            <li><a href="/razor/BatchGenerator">批量模板代码生成器</a></li>
+                            <li><a href="/razor/DatabaseConfig">数据库配置</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" data-toggle="dropdown">
+                            从模型生成
+                            <span class="caret dropdown-toggle"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="/CodeFirst/index">单模型代码生成器</a></li>
+                            <li><a href="/CodeFirst/BatchGenerator">批量模型代码生成器</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/Razor/TemplateMgr">模板管理</a></li>
+                    <li><a href="/About">关于</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <header class="jumbotron subhead" id="overview">
+        <div style="position:absolute;height:139px;top:50px;overflow:hidden;left:0px;z-index:-1;background-color:#eee;width:100%;" >
+            <canvas id="canvasBG" height="139"></canvas>
+        </div>
+        <div class="container" style="z-index:10">
+            <h2>模板代码生成器</h2>
+            <p class="lead">@ViewBag.Desc</p>
+        </div>
+    </header>
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - 模板代码生成器 - Powered By QiuHaoTC</p>
+        </footer>
+    </div>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/scripts/CanvasBG.js"></script>@RenderSection("Scripts", false)
+</body>
+</html>

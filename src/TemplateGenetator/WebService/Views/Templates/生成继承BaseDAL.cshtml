@@ -1,0 +1,15 @@
+using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Data;
+namespace @ViewBag.NameSpaceStr
+{
+    //@ViewBag.ClassName
+    public class @ViewBag.ClassName: BaseDAL<Model.@ViewBag.ClassName>
+    {
+        public override void SetParameter()
+        {
+            TableName = @@"@ViewBag.ClassName";
+        }
+    }
+}

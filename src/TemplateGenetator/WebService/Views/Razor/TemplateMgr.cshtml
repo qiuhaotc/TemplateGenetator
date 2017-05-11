@@ -1,0 +1,94 @@
+﻿@model List<WebService.Data.TempInfo>
+@{
+    ViewBag.Title = "模板管理";
+}
+<style>
+    .table .center, .table th, .table td {
+        text-align: center;
+    }
+</style>
+
+<div class="page-header">
+    <h2>模板管理</h2>
+</div>
+<div class="table-responsive">
+    <button type="button" class="btn btn-success" onclick="addItem()">新增模板</button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    名称
+                </th>
+                <th>
+                    模板类型
+                </th>
+                <th class="hidden-xs hidden-sm">
+                    临时文件夹
+                </th>
+                <th class="hidden-xs hidden-sm">
+                    命名空间
+                </th>
+                <th class="hidden-xs hidden-sm">
+                    后缀
+                </th>
+                <th>
+                    简介
+                </th>
+                <th class="hidden-xs hidden-sm hidden-md">
+                    路径
+                </th>
+                <th>
+                    编辑
+                </th>
+                <th>
+                    删除
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TP_Name</td>
+                    <td>@(TemplateGenerator.Util.EnumHelper.GetEnumDescription<WebService.Data.TemplateType>((WebService.Data.TemplateType)item.TP_Type))</td>
+                    <td class="hidden-xs hidden-sm">@item.TP_FolderName</td>
+                    <td class="hidden-xs hidden-sm">@item.TP_NameSpace</td>
+                    <td class="hidden-xs hidden-sm">@item.TP_Extention</td>
+                    <td>@item.TP_Desc</td>
+                    <td class="hidden-xs hidden-sm hidden-md">@item.TP_URL</td>
+                    <td class="center"><button type="button" class="btn btn-warning" onclick="editItem(@item.TP_ID)">编辑</button></td>
+                    <td class="center"><button type="button" class="btn btn-danger" onclick="deleteItem(@item.TP_ID,'@item.TP_Name')">删除</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section Scripts{
+    <script>
+        function deleteItem(id, name) {
+
+            if (confirm("确定要删除[" + name + "]吗?")) {
+                $.post("@Url.Action("tempdelete","razor")/" + id, function (data) {
+                    if (data.Status == 1) {
+                        alert(data.Desc);
+                        location.href = location.href;
+                    }
+                    else {
+                        alert(data.Desc);
+                    }
+                })
+            }
+
+        }
+
+        function editItem(id) {
+            location.href = "/razor/tempedit/" + id;
+        }
+        function addItem() {
+            location.href = "@Url.Action("TempAdd", "razor")";
+        }
+
+    </script>
+}

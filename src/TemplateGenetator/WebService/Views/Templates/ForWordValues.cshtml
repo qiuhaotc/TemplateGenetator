@@ -1,0 +1,47 @@
+@using TemplateGenerator.RazorGenerator
+@{
+
+    var list = ViewBag.Data as IList<TemplateGenerator.GeneratorModel.TableInfoModel>;
+
+    List<string> keys = new List<string>();
+    List<string> values = new List<string>();
+
+
+    foreach (var item in list)
+    {
+        keys.Add("\""+item.ColName+"\"");
+
+        string formartStr = "";
+
+        if(item.ColType=="datetime")
+        {
+            if(item.ColName.ToLower().Contains("adddate") || item.ColName.ToLower().Contains("updatedate"))
+            {
+                formartStr = "\"yyyy-MM-dd\"";
+                values.Add("model." + item.ColName + ".ToString("+formartStr+")");
+            }
+            else
+            {
+                formartStr = "\"yyyy-MM-dd\"";
+                values.Add("(model." + item.ColName + ".HasValue? model." + item.ColName + ".Value.ToString(" + formartStr + "):\"\")");
+            }
+
+        }
+        else
+        {
+            if(item.ColType=="nvarchar"||item.ColType=="varchar")
+            {
+                values.Add("model." + item.ColName);
+            }
+            else
+            {
+                values.Add("model." + item.ColName + ".ToString()");
+            }
+
+        }
+
+
+    }
+}
+string[] keys = {@Raw(string.Join(",",keys.ToArray()))};
+string[] values = {@Raw(string.Join(",", values.ToArray()))};

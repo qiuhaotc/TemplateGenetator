@@ -1,0 +1,174 @@
+﻿
+@{
+    ViewBag.Title = "模板代码生成器";
+}
+
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-pills nav-stacked" role="tablist">
+            <li role="presentation" class="active"><a href="/razor/index">模板代码生成器</a></li>
+            <li role="presentation"><a href="/razor/BatchGenerator">批量模板代码生成器</a></li>
+            <li role="presentation"><a href="/razor/DatabaseConfig">数据库配置</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <form role="form" id="contentVue">
+            <div class="panel panel-default ">
+                <div class="panel-heading"><div class="panel-title">模板代码生成器</div></div>
+                <div class="panel-body">
+                    <div class="form-group" >
+                        <button type="button" class="btn btn-info" v-on:click="getData">获取参数</button>
+                        <img v-if="isPending" src="~/Image/pending.gif" v-cloak/>
+                        <img v-if="!isPending" src="~/Image/yes.png" v-cloak/>
+                    </div>
+                    <div class="form-group">
+                        <label for="tempID">模板名称</label>
+                        <select class="form-control" id="tempID" name="tempID" v-model="tempID" v-cloak>
+                            <option v-for="item in templates" value="{{item.Key}}">{{item.Name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tableName">数据库表名</label>
+                        <select class="form-control" id="tableName" name="tableName" v-model="tableName" v-cloak>
+                            <option  v-for="item in tableNames" value="{{item.Key}}">{{item.Name}}</option>
+                        </select>
+                    </div>
+                    @*<h2>结果</h2>*@
+                    <div class="form-group">
+                        <label for="isUpdate">模板是否已更新</label>
+                        <div class="checkbox">
+                            <label for="isUpdate">
+                                <input type="checkbox" id="isUpdate" name="isUpdate" v-model="isUpdate" />已更新
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" v-on:click="sendData">生成数据</button>
+                        <img v-if="isGenerator" src="~/Image/pending.gif" v-cloak/>
+                    </div>
+                    <div v-if="isError" transition="expand" class="alert alert-danger" role="alert" v-cloak>
+                        {{errorStr}}
+                    </div>
+                    <div class="form-group">
+                        <label for="result">生成结果</label>
+                        <textarea class="form-control" style="height:300px" v-model="result" id="result"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/scripts/vue.js"></script>
+    <script>
+        // 直接创建一个实例
+        var vm = new Vue({
+            el: '#contentVue',
+            data: {
+                tempID: 0,
+                tableName: "",
+                isUpdate: false,
+                result: "",
+                templates: [],
+                tableNames: [],
+                isPending: false,
+                isGenerator: false,
+                isError: false,
+                errorStr:""
+            },
+            methods: {
+                getData: function () {
+
+                    if (this.isPending || this.isGenerator) {
+
+                        vm.isError = true;
+                        vm.errorStr = "上一个请求还未结束!";
+
+                        return;
+                    }
+
+                    this.isPending = true;
+
+                    $.post("/razor/GetData", function (data) {
+                        if (data.Status == 1) {
+                            console.log(data.Data)
+                            console.log(data.DataTable)
+                            vm.templates = data.Data;
+                            vm.tableNames = data.DataTable;
+                            vm.isError = false;
+                            vm.errorStr = "";
+                        }
+                        else {
+                            vm.templates = [];
+                            vm.tableNames = [];
+                            console.log(data.Desc)
+                            vm.errorStr = "发送错误." + data.Desc;
+                            vm.isError = true;
+                        }
+
+                        vm.isPending = false;
+                    }, 'json');
+                },
+                sendData: function () {
+
+                    if (this.tempID == 0 || this.tableName == "") {
+
+                        vm.errorStr = "模板名称或数据库表名不能为空!";
+                        vm.isError = true;
+
+                        return;
+                    }
+                    else {
+                        vm.errorStr = "";
+                        vm.isError = false;
+                    }
+
+                    if (this.isGenerator || this.isPending) {
+                        
+                        vm.isError = true;
+                        vm.errorStr = "上一个请求还未结束!";
+
+                        return;
+                    }
+
+                    this.isGenerator = true;
+
+
+
+                    $.post("/razor/GeneratorData/" + this.tempID + "/" + this.tableName + "/" + this.isUpdate, function (data) {
+                        if (data.Status == 1) {
+
+                            console.log(data.Result)
+
+                            vm.result = data.Result;
+
+                            if (vm.isUpdate) {
+                                vm.isUpdate = !vm.isUpdate;
+                            }
+
+                            vm.errorStr = "";
+                            vm.isError = false;
+                        }
+                        else {
+
+                            console.log(data.Desc)
+
+                            vm.errorStr = "发送错误." + data.Desc;
+                            vm.isError = true;
+                        }
+
+                        vm.isGenerator = false;
+
+                    }, 'json');
+                }
+            }
+        });
+
+        $(function () {
+            vm.getData();
+
+        })
+    </script>
+}
+
